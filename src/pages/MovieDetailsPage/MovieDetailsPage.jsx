@@ -1,15 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import {
   Link,
   Outlet,
-  Route,
-  Routes,
   useLocation,
   useNavigate,
   useParams,
 } from 'react-router-dom';
-import MovieCast from '../../components/MovieCast/MovieCast';
-import MovieReviews from '../../components/MovieReviews/MovieReviews';
 import styles from './MovieDetailsPage.module.css';
 
 const MovieDetailsPage = ({
@@ -21,8 +17,7 @@ const MovieDetailsPage = ({
   const [movie, setMovie] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
-
-  const backLink = location.state?.from ?? '/movies';
+  const backLinkRef = useRef(location.state?.from ?? '/movies');
 
   useEffect(() => {
     const loadMovie = async () => {
@@ -40,7 +35,10 @@ const MovieDetailsPage = ({
 
   return (
     <div className={styles.container}>
-      <button onClick={() => navigate(backLink)} className={styles.backButton}>
+      <button
+        onClick={() => navigate(backLinkRef.current)}
+        className={styles.backButton}
+      >
         Go back
       </button>
 
@@ -53,7 +51,6 @@ const MovieDetailsPage = ({
           }
           alt={movie.title}
         />
-
         <div className={styles.info}>
           <h2>{movie.title}</h2>
           <p>
@@ -70,30 +67,24 @@ const MovieDetailsPage = ({
         <p>Additional information:</p>
         <ul>
           <li>
-            <Link to={`/movies/${movieId}/cast`} state={{ from: backLink }}>
+            <Link to="cast" state={{ from: backLinkRef.current }}>
               Cast
             </Link>
           </li>
           <li>
-            <Link to={`/movies/${movieId}/reviews`} state={{ from: backLink }}>
+            <Link to="reviews" state={{ from: backLinkRef.current }}>
               Reviews
             </Link>
           </li>
         </ul>
       </div>
 
-      <Routes>
-        <Route
-          path="cast"
-          element={<MovieCast fetchMovieCast={fetchMovieCast} />}
-        />
-        <Route
-          path="reviews"
-          element={<MovieReviews fetchMovieReviews={fetchMovieReviews} />}
-        />
-      </Routes>
-
-      <Outlet />
+      <Outlet
+        context={{
+          fetchMovieCast,
+          fetchMovieReviews,
+        }}
+      />
     </div>
   );
 };

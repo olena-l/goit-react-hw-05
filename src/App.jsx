@@ -8,11 +8,16 @@ const MoviesPage = lazy(() => import('./pages/MoviesPage/MoviesPage'));
 const MovieDetailsPage = lazy(() =>
   import('./pages/MovieDetailsPage/MovieDetailsPage')
 );
+const MovieCast = lazy(() => import('./components/MovieCast/MovieCast'));
+const MovieReviews = lazy(() =>
+  import('./components/MovieReviews/MovieReviews')
+);
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage/NotFoundPage'));
 
 const API_KEY = '508a24d8ff444c4ae069e6feef1a68bd';
 const BASE_URL = 'https://api.themoviedb.org/3';
 
+// API functions
 const fetchTrendingMovies = async () => {
   const res = await axios.get(
     `${BASE_URL}/trending/movie/day?api_key=${API_KEY}`
@@ -61,7 +66,7 @@ function App() {
             element={<MoviesPage searchMovies={searchMovies} />}
           />
           <Route
-            path="/movies/:movieId/*"
+            path="/movies/:movieId"
             element={
               <MovieDetailsPage
                 fetchMovieDetails={fetchMovieDetails}
@@ -69,7 +74,16 @@ function App() {
                 fetchMovieReviews={fetchMovieReviews}
               />
             }
-          />
+          >
+            <Route
+              path="cast"
+              element={<MovieCast fetchMovieCast={fetchMovieCast} />}
+            />
+            <Route
+              path="reviews"
+              element={<MovieReviews fetchMovieReviews={fetchMovieReviews} />}
+            />
+          </Route>
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Suspense>
